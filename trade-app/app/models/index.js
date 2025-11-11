@@ -19,5 +19,18 @@ db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
 db.Hotel = require("./hotel.model.js")(sequelize, Sequelize);
+db.User = require("./user.model.js")(sequelize, Sequelize);
+db.Client = require("./client.model.js")(sequelize, Sequelize);
+
+db.User.hasOne(db.Client, { 
+    foreignKey: 'ID_User', 
+    onDelete: 'CASCADE', 
+    as: 'clientProfile'
+});
+db.Client.belongsTo(db.User, { 
+    foreignKey: 'ID_User',
+    as: 'userAccount'
+});
+
 
 module.exports = db;
