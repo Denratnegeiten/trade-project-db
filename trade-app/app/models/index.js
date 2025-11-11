@@ -24,6 +24,7 @@ db.Client = require("./client.model.js")(sequelize, Sequelize);
 db.Employee = require("./employee.model.js")(sequelize, Sequelize);
 db.Room = require("./room.model.js")(sequelize, Sequelize);
 db.Booking = require("./booking.model.js")(sequelize, Sequelize);
+db.Payment = require("./payment.model.js")(sequelize, Sequelize);
 
 db.User.hasOne(db.Client, { 
     foreignKey: 'ID_User', 
@@ -88,6 +89,17 @@ db.Booking.belongsTo(db.Employee, {
     foreignKey: 'ID_Employee',
     onDelete: 'SET NULL', 
     as: 'employee' 
+});
+
+db.Booking.hasOne(db.Payment, { 
+    foreignKey: 'ID_Booking', 
+    onDelete: 'RESTRICT', 
+    as: 'payment' 
+});
+db.Payment.belongsTo(db.Booking, { 
+    foreignKey: 'ID_Booking',
+    onDelete: 'RESTRICT', 
+    as: 'booking' 
 });
 
 module.exports = db;
