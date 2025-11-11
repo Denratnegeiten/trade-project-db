@@ -22,6 +22,7 @@ db.Hotel = require("./hotel.model.js")(sequelize, Sequelize);
 db.User = require("./user.model.js")(sequelize, Sequelize);
 db.Client = require("./client.model.js")(sequelize, Sequelize);
 db.Employee = require("./employee.model.js")(sequelize, Sequelize);
+db.Room = require("./room.model.js")(sequelize, Sequelize);
 
 db.User.hasOne(db.Client, { 
     foreignKey: 'ID_User', 
@@ -43,5 +44,17 @@ db.Employee.belongsTo(db.Hotel, {
     onDelete: 'RESTRICT', 
     as: 'hotel' 
 });
+
+db.Hotel.hasMany(db.Room, { 
+    foreignKey: 'ID_Hotel', 
+    onDelete: 'CASCADE', 
+    as: 'rooms' 
+});
+db.Room.belongsTo(db.Hotel, { 
+    foreignKey: 'ID_Hotel',
+    onDelete: 'CASCADE', 
+    as: 'hotel' 
+});
+
 
 module.exports = db;
