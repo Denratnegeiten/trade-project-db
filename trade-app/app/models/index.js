@@ -21,6 +21,7 @@ db.sequelize = sequelize;
 db.Hotel = require("./hotel.model.js")(sequelize, Sequelize);
 db.User = require("./user.model.js")(sequelize, Sequelize);
 db.Client = require("./client.model.js")(sequelize, Sequelize);
+db.Employee = require("./employee.model.js")(sequelize, Sequelize);
 
 db.User.hasOne(db.Client, { 
     foreignKey: 'ID_User', 
@@ -32,5 +33,15 @@ db.Client.belongsTo(db.User, {
     as: 'userAccount'
 });
 
+db.Hotel.hasMany(db.Employee, { 
+    foreignKey: 'ID_Hotel', 
+    onDelete: 'RESTRICT', 
+    as: 'employees' 
+});
+db.Employee.belongsTo(db.Hotel, { 
+    foreignKey: 'ID_Hotel',
+    onDelete: 'RESTRICT', 
+    as: 'hotel' 
+});
 
 module.exports = db;
