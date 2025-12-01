@@ -1,24 +1,29 @@
 module.exports = (sequelize, Sequelize) => {
     const Client = sequelize.define("Client", {
-        ID_Client: {
+        id: {
             type: Sequelize.INTEGER,
             primaryKey: true,
             autoIncrement: true
         },
-        ID_User: {
+        userId: {
             type: Sequelize.INTEGER,
             allowNull: false,
             unique: true 
         },
-        FirstName: {
+        firstName: {
             type: Sequelize.STRING(50),
             allowNull: false
         },
-        LastName: {
+        lastName: {
             type: Sequelize.STRING(50),
             allowNull: false
         },
-        Phone: {
+        email: {               // ← добавили email, ты его используешь
+            type: Sequelize.STRING(100),
+            allowNull: false,
+            unique: true
+        },
+        phone: {
             type: Sequelize.STRING(20),
             allowNull: false
         }
