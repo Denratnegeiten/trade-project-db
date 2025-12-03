@@ -5,17 +5,13 @@ module.exports = (sequelize, Sequelize) => {
             primaryKey: true,
             autoIncrement: true
         },
-        ID_Room: {
-            type: Sequelize.INTEGER,
-            allowNull: false
-        },
         ID_Client: {
             type: Sequelize.INTEGER,
             allowNull: false
         },
-        ID_Employee: {
+        ID_Room: {
             type: Sequelize.INTEGER,
-            allowNull: true 
+            allowNull: false
         },
         CheckInDate: {
             type: Sequelize.DATEONLY,
@@ -25,12 +21,13 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.DATEONLY,
             allowNull: false
         },
-        TotalCost: {
-            type: Sequelize.DECIMAL(10, 2),
-            allowNull: false
-        },
         Status: {
-            type: Sequelize.STRING(50),
+            type: Sequelize.STRING(20),
+            allowNull: false,
+            defaultValue: 'pending'
+        },
+        TotalAmount: {
+            type: Sequelize.DECIMAL(10, 2),
             allowNull: false
         }
     }, {

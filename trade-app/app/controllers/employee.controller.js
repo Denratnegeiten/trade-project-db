@@ -1,130 +1,44 @@
 const db = require("../models");
-const Employee = db.Employee;
-const Op = db.Sequelize.Op;
+const Employee = db.employee;
 
-exports.create = (req, res) => {
-  if (!req.body.firstName || !req.body.position) {
-    res.status(400).send({
-      message: "First name and position cannot be empty!"
-    });
-    return;
-  }
-
-  const employee = {
-    firstName: req.body.firstName,
-    lastName: req.body.lastName,
-    position: req.body.position,
-    salary: req.body.salary
-  };
-
-  Employee.create(employee)
-    .then(data => {
-      res.send(data);
-    })
-    .catch(err => {
-      res.status(500).send({
-        message:
-          err.message || "Some error occurred while creating the Employee."
-      });
-    });
+exports.create = async (req, res) => {
+    try {
+        const data = await Employee.create(req.body);
+        res.status(201).send(data);
+    } catch (e) { res.status(500).send({ message: e.message }); }
 };
 
-exports.findAll = (req, res) => {
-  const position = req.query.position;
-  var condition = position ? { position: { [Op.iLike]: `%${position}%` } } : null;
-
-  Employee.findAll({ where: condition })
-    .then(data => {
-      res.send(data);
-    })
-    .catch(err => {
-      res.status(500).send({
-        message:
-          err.message || "Some error occurred while retrieving employees."
-      });
-    });
-};
-
-exports.findOne = (req, res) => {
-  const id = req.params.id;
-
-  Employee.findByPk(id)
-    .then(data => {
-      if (data) {
+exports.findAll = async (_req, res) => {
+    try {
+        const data = await Employee.findAll();
         res.send(data);
-      } else {
-        res.status(404).send({
-          message: `Cannot find Employee with id=${id}.`
-        });
-      }
-    })
-    .catch(err => {
-      res.status(500).send({
-        message: "Error retrieving Employee with id=" + id
-      });
-    });
+    } catch (e) { res.status(500).send({ message: e.message }); }
 };
 
-exports.update = (req, res) => {
-  const id = req.params.id;
-
-  Employee.update(req.body, {
-    where: { id: id }
-  })
-    .then(num => {
-      if (num == 1) {
-        res.send({
-          message: "Employee was updated successfully."
-        });
-      } else {
-        res.send({
-          message: `Cannot update Employee with id=${id}. Maybe Employee was not found or req.body is empty!`
-        });
-      }
-    })
-    .catch(err => {
-      res.status(500).send({
-        message: "Error updating Employee with id=" + id
-      });
-    });
+exports.findOne = async (req, res) => {
+    try {
+        const item = await Employee.findByPk(req.params.id);
+        item ? res.send(item) : res.status(404).send({ message: "Not found" });
+    } catch (e) { res.status(500).send({ message: e.message }); }
 };
 
-exports.delete = (req, res) => {
-  const id = req.params.id;
-
-  Employee.destroy({
-    where: { id: id }
-  })
-    .then(num => {
-      if (num == 1) {
-        res.send({
-          message: "Employee was deleted successfully!"
-        });
-      } else {
-        res.send({
-          message: `Cannot delete Employee with id=${id}. Maybe Employee was not found!`
-        });
-      }
-    })
-    .catch(err => {
-      res.status(500).send({
-        message: "Could not delete Employee with id=" + id
-      });
-    });
+exports.update = async (req, res) => {
+    try {
+        const result = await Employee.update(req.body, { where: { id: req.params.id }});
+        result[0] ? res.send({ message: "Updated" }) : res.status(404).send({ message: "Not found" });
+    } catch (e) { res.status(500).send({ message: e.message }); }
 };
 
-exports.deleteAll = (req, res) => {
-  Employee.destroy({
-    where: {},
-    truncate: false
-  })
-    .then(nums => {
-      res.send({ message: `${nums} Employees were deleted successfully!` });
-    })
-    .catch(err => {
-      res.status(500).send({
-        message:
-          err.message || "Some error occurred while removing all employees."
-      });
-    });
+exports.delete = async (req, res) => {
+    try {
+        const result = await Employee.destroy({ where: { id: req.params.id }});
+        result ? res.send({ message: "Deleted" }) : res.status(404).send({ message: "Not found" });
+    } catch (e) { res.status(500).send({ message: e.message }); }
+};
+
+exports.deleteAll = async (_req, res) => {
+    try {
+        const count = await Employee.destroy({ where: {}, truncate: false });
+        res.send({ message: `${count} records deleted` });
+    } catch (e) { res.status(500).send({ message: e.message }); }
 };

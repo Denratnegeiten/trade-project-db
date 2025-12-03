@@ -1,5 +1,6 @@
 module.exports = (sequelize, Sequelize) => {
-   const Hotel = sequelize.define("Hotel", {
+    const Hotel = sequelize.define("Hotel", {
+        // ID_Hotel будет автоматически Primary Key и AutoIncrement
         ID_Hotel: {
             type: Sequelize.INTEGER,
             primaryKey: true,
@@ -7,20 +8,37 @@ module.exports = (sequelize, Sequelize) => {
         },
         Name: {
             type: Sequelize.STRING(50),
-            allowNull: false,
-            unique: true 
+            allowNull: false, // Обязательное поле
+            unique: true
         },
         Address: {
             type: Sequelize.STRING(255),
-            allowNull: false
+            allowNull: false // Обязательное поле
+        },
+        Stars: {
+            // Stars — это целое число от 1 до 5
+            type: Sequelize.INTEGER,
+            allowNull: false, // Обязательное поле
+            validate: {
+                min: 1,
+                max: 5
+            }
         },
         Category: {
             type: Sequelize.STRING(50),
-            allowNull: false
+            allowNull: true // Сделаем его необязательным для проверки
         }
     }, {
-        freezeTableName: true
+        // Указываем имя таблицы
+        tableName: 'Hotel',
+        // Отключаем автоматические временные метки (если не нужны)
+        // timestamps: false
     });
-    
+
+    // Определение связей (если есть)
+    // Hotel.associate = function(models) {
+    //     // associations can be defined here
+    // };
+
     return Hotel;
 };

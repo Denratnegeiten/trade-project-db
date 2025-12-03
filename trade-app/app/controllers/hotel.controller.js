@@ -1,130 +1,139 @@
 const db = require("../models");
+// Инициализируем модель Hotel из объекта базы данных
 const Hotel = db.Hotel;
 const Op = db.Sequelize.Op;
 
+// 1. Создание и сохранение нового отеля (Create)
 exports.create = (req, res) => {
-  if (!req.body.name || !req.body.city) {
-    res.status(400).send({
-      message: "Hotel name and city cannot be empty!"
-    });
-    return;
-  }
-
-  const hotel = {
-    name: req.body.name,
-    address: req.body.address,
-    city: req.body.city,
-    rating: req.body.rating
-  };
-
-  Hotel.create(hotel)
-    .then(data => {
-      res.send(data);
-    })
-    .catch(err => {
-      res.status(500).send({
-        message:
-          err.message || "Some error occurred while creating the Hotel."
-      });
-    });
+    // 1.1. Валидация входных данных. Используем поля Name, Address, Stars.
+    // Проверяем, что Name и Address - не пустые строки, а Stars - определено.
+    if (!req.body.Name || !req.body.Address || typeof req.body.Stars === 'undefined' || req.body.Stars === null) {
+        res.status(400).send({
+            message: "Content cannot be empty! Name, Address, and Stars are required."
+        });
+        return;
+    }
+    
+    // 1.2. Создание объекта отеля
+    const hotel = {
+        // Имена полей в JSON должны совпадать с именами в модели (с большой буквы)
+        Name: req.body.Name,
+        Address: req.body.Address,
+        Stars: req.body.Stars
+        // ID_Hotel будет сгенерирован автоматически (autoIncrement)
+    };
+    
+    // 1.3. Сохранение отеля в БД
+    Hotel.create(hotel)
+        .then(data => {
+            // Возвращаем клиенту созданный объект
+            res.status(201).send(data);
+        })
+        .catch(err => {
+            // Обработка ошибок БД или сервера
+            res.status(500).send({
+                message: err.message || "Some error occurred while creating the Hotel."
+            });
+        });
 };
 
+// 2. Получение всех отелей из базы данных (ReadAll)
 exports.findAll = (req, res) => {
-  const city = req.query.city;
-  var condition = city ? { city: { [Op.iLike]: `%${city}%` } } : null;
-
-  Hotel.findAll({ where: condition })
-    .then(data => {
-      res.send(data);
-    })
-    .catch(err => {
-      res.status(500).send({
-        message:
-          err.message || "Some error occurred while retrieving hotels."
-      });
-    });
+    // Получение всех записей (без фильтрации)
+    Hotel.findAll()
+        .then(data => {
+            res.send(data);
+        })
+        .catch(err => {
+            res.status(500).send({
+                message: err.message || "Some error occurred while retrieving hotels."
+            });
+        });
 };
 
+// 3. Получение одного отеля по ID (ReadOne)
 exports.findOne = (req, res) => {
-  const id = req.params.id;
+    const id = req.params.id; // ID берется из URL-параметра
 
-  Hotel.findByPk(id)
-    .then(data => {
-      if (data) {
-        res.send(data);
-      } else {
-        res.status(404).send({
-          message: `Cannot find Hotel with id=${id}.`
+    Hotel.findByPk(id)
+        .then(data => {
+            if (data) {
+                res.send(data);
+            } else {
+                res.status(404).send({
+                    message: `Cannot find Hotel with ID=${id}.`
+                });
+            }
+        })
+        .catch(err => {
+            res.status(500).send({
+                message: "Error retrieving Hotel with ID=" + id
+            });
         });
-      }
-    })
-    .catch(err => {
-      res.status(500).send({
-        message: "Error retrieving Hotel with id=" + id
-      });
-    });
 };
 
+// 4. Обновление отеля по ID (Update)
 exports.update = (req, res) => {
-  const id = req.params.id;
+    const id = req.params.id; // ID берется из URL-параметра
 
-  Hotel.update(req.body, {
-    where: { id: id }
-  })
+    Hotel.update(req.body, {
+        where: { ID_Hotel: id } // Ищем по первичному ключу
+    })
     .then(num => {
-      if (num == 1) {
-        res.send({
-          message: "Hotel was updated successfully."
-        });
-      } else {
-        res.send({
-          message: `Cannot update Hotel with id=${id}. Maybe Hotel was not found or req.body is empty!`
-        });
-      }
+        if (num == 1) {
+            res.send({
+                message: "Hotel was updated successfully."
+            });
+        } else {
+            res.send({
+                message: `Cannot update Hotel with ID=${id}. Maybe Hotel was not found or req.body is empty!`
+            });
+        }
     })
     .catch(err => {
-      res.status(500).send({
-        message: "Error updating Hotel with id=" + id
-      });
+        res.status(500).send({
+            message: "Error updating Hotel with ID=" + id
+        });
     });
 };
 
+// 5. Удаление отеля по ID (DeleteOne)
 exports.delete = (req, res) => {
-  const id = req.params.id;
+    const id = req.params.id;
 
-  Hotel.destroy({
-    where: { id: id }
-  })
+    Hotel.destroy({
+        where: { ID_Hotel: id }
+    })
     .then(num => {
-      if (num == 1) {
-        res.send({
-          message: "Hotel was deleted successfully!"
-        });
-      } else {
-        res.send({
-          message: `Cannot delete Hotel with id=${id}. Maybe Hotel was not found!`
-        });
-      }
+        if (num == 1) {
+            res.send({
+                message: "Hotel was deleted successfully!"
+            });
+        } else {
+            res.send({
+                message: `Cannot delete Hotel with ID=${id}. Maybe Hotel was not found!`
+            });
+        }
     })
     .catch(err => {
-      res.status(500).send({
-        message: "Could not delete Hotel with id=" + id
-      });
+        res.status(500).send({
+            message: "Could not delete Hotel with ID=" + id
+        });
     });
 };
 
+// 6. Удаление всех отелей (DeleteAll)
 exports.deleteAll = (req, res) => {
-  Hotel.destroy({
-    where: {},
-    truncate: false
-  })
+    Hotel.destroy({
+        where: {},
+        truncate: false
+    })
     .then(nums => {
-      res.send({ message: `${nums} Hotels were deleted successfully!` });
+        res.send({ message: `${nums} Hotels were deleted successfully!` });
     })
     .catch(err => {
-      res.status(500).send({
-        message:
-          err.message || "Some error occurred while removing all hotels."
-      });
+        res.status(500).send({
+            message: err.message || "Some error occurred while removing all hotels."
+        });
     });
 };

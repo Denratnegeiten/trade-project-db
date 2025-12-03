@@ -17,7 +17,7 @@ services:
     container_name: trade_app
     depends_on:
       - postgresdb
-    build: ./trade-app
+    build: ./trade-app # <--- Измените на "." или ./trade-app, в зависимости от Dockerfile
     restart: unless-stopped
     env_file: ./.env
     ports:
@@ -32,6 +32,9 @@ services:
       - APP_PORT=${APP_PORT}
     stdin_open: true
     tty: true
+    volumes: # <--- ДОБАВИТЬ ЭТУ СЕКЦИЮ!
+      - ./trade-app:/trade-app   # Синхронизация папки проекта
+      - /trade-app/node_modules # Исключение папки node_modules (если она есть)
 
 volumes:
   db_new:

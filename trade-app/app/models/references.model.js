@@ -1,26 +1,19 @@
 module.exports = (db) => {
+    db.Client.belongsTo(db.User, { foreignKey: 'ID_User', as: 'User' });
+    db.User.hasMany(db.Client, { foreignKey: 'ID_User', as: 'Clients' });
 
-    db.Hotel.hasMany(db.Room, { foreignKey: 'ID_Hotel', onDelete: 'CASCADE' });
-    db.Room.belongsTo(db.Hotel, { foreignKey: 'ID_Hotel' });
+    db.Employee.belongsTo(db.Hotel, { foreignKey: 'ID_Hotel', as: 'Hotel' });
+    db.Hotel.hasMany(db.Employee, { foreignKey: 'ID_Hotel', as: 'Employees' });
 
-    db.Hotel.hasMany(db.Employee, { foreignKey: 'ID_Hotel', onDelete: 'SET NULL' });
-    db.Employee.belongsTo(db.Hotel, { foreignKey: 'ID_Hotel' });
+    db.Room.belongsTo(db.Hotel, { foreignKey: 'ID_Hotel', as: 'Hotel' });
+    db.Hotel.hasMany(db.Room, { foreignKey: 'ID_Hotel', as: 'Rooms' });
 
-    db.User.hasOne(db.Client, { foreignKey: 'ID_User', onDelete: 'CASCADE' });
-    db.Client.belongsTo(db.User, { foreignKey: 'ID_User' });
+    db.Booking.belongsTo(db.Client, { foreignKey: 'ID_Client', as: 'Client' });
+    db.Client.hasMany(db.Booking, { foreignKey: 'ID_Client', as: 'Bookings' });
 
-    db.Room.hasMany(db.Booking, { foreignKey: 'ID_Room', onDelete: 'RESTRICT' });
-    db.Booking.belongsTo(db.Room, { foreignKey: 'ID_Room' });
+    db.Booking.belongsTo(db.Room, { foreignKey: 'ID_Room', as: 'Room' });
+    db.Room.hasMany(db.Booking, { foreignKey: 'ID_Room', as: 'Bookings' });
 
-    db.Client.hasMany(db.Booking, { foreignKey: 'ID_Client', onDelete: 'RESTRICT' });
-    db.Booking.belongsTo(db.Client, { foreignKey: 'ID_Client' });
-
-    db.Employee.hasMany(db.Booking, { foreignKey: 'ID_Employee', onDelete: 'SET NULL' });
-    db.Booking.belongsTo(db.Employee, { foreignKey: 'ID_Employee' });
-
-    db.Booking.hasOne(db.Payment, { foreignKey: 'ID_Booking', onDelete: 'CASCADE' });
-    db.Payment.belongsTo(db.Booking, { foreignKey: 'ID_Booking' });
-
-
-    console.log("Database associations defined successfully.");
+    db.Payment.belongsTo(db.Booking, { foreignKey: 'ID_Booking', as: 'Booking' });
+    db.Booking.hasMany(db.Payment, { foreignKey: 'ID_Booking', as: 'Payments' });
 };

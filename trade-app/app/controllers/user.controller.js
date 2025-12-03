@@ -1,131 +1,44 @@
 const db = require("../models");
-const User = db.User;
-const Op = db.Sequelize.Op;
-// NOTE: In a real application, you should use bcrypt or similar library 
-// to hash the password before saving and compare hashed passwords during login.
+const User = db.user;
 
-exports.create = (req, res) => {
-  if (!req.body.username || !req.body.password) {
-    res.status(400).send({
-      message: "Username and password cannot be empty!"
-    });
-    return;
-  }
-
-  const user = {
-    username: req.body.username,
-    password: req.body.password, 
-    role: req.body.role || 'client'
-  };
-
-  User.create(user)
-    .then(data => {
-      res.send(data);
-    })
-    .catch(err => {
-      res.status(500).send({
-        message:
-          err.message || "Some error occurred while creating the User."
-      });
-    });
+exports.create = async (req, res) => {
+    try {
+        const data = await User.create(req.body);
+        res.status(201).send(data);
+    } catch (e) { res.status(500).send({ message: e.message }); }
 };
 
-exports.findAll = (req, res) => {
-  const role = req.query.role;
-  var condition = role ? { role: { [Op.iLike]: `%${role}%` } } : null;
-
-  User.findAll({ where: condition })
-    .then(data => {
-      res.send(data);
-    })
-    .catch(err => {
-      res.status(500).send({
-        message:
-          err.message || "Some error occurred while retrieving users."
-      });
-    });
-};
-
-exports.findOne = (req, res) => {
-  const id = req.params.id;
-
-  User.findByPk(id, { include: ["employee", "client"] }) 
-    .then(data => {
-      if (data) {
+exports.findAll = async (_req, res) => {
+    try {
+        const data = await User.findAll();
         res.send(data);
-      } else {
-        res.status(404).send({
-          message: `Cannot find User with id=${id}.`
-        });
-      }
-    })
-    .catch(err => {
-      res.status(500).send({
-        message: "Error retrieving User with id=" + id
-      });
-    });
+    } catch (e) { res.status(500).send({ message: e.message }); }
 };
 
-exports.update = (req, res) => {
-  const id = req.params.id;
-
-  User.update(req.body, {
-    where: { id: id }
-  })
-    .then(num => {
-      if (num == 1) {
-        res.send({
-          message: "User was updated successfully."
-        });
-      } else {
-        res.send({
-          message: `Cannot update User with id=${id}. Maybe User was not found or req.body is empty!`
-        });
-      }
-    })
-    .catch(err => {
-      res.status(500).send({
-        message: "Error updating User with id=" + id
-      });
-    });
+exports.findOne = async (req, res) => {
+    try {
+        const item = await User.findByPk(req.params.id);
+        item ? res.send(item) : res.status(404).send({ message: "Not found" });
+    } catch (e) { res.status(500).send({ message: e.message }); }
 };
 
-exports.delete = (req, res) => {
-  const id = req.params.id;
-
-  User.destroy({
-    where: { id: id }
-  })
-    .then(num => {
-      if (num == 1) {
-        res.send({
-          message: "User was deleted successfully!"
-        });
-      } else {
-        res.send({
-          message: `Cannot delete User with id=${id}. Maybe User was not found!`
-        });
-      }
-    })
-    .catch(err => {
-      res.status(500).send({
-        message: "Could not delete User with id=" + id
-      });
-    });
+exports.update = async (req, res) => {
+    try {
+        const result = await User.update(req.body, { where: { ID_User: req.params.id }});
+        result[0] ? res.send({ message: "Updated" }) : res.status(404).send({ message: "Not found" });
+    } catch (e) { res.status(500).send({ message: e.message }); }
 };
 
-exports.deleteAll = (req, res) => {
-  User.destroy({
-    where: {},
-    truncate: false
-  })
-    .then(nums => {
-      res.send({ message: `${nums} Users were deleted successfully!` });
-    })
-    .catch(err => {
-      res.status(500).send({
-        message:
-          err.message || "Some error occurred while removing all users."
-      });
-    });
+exports.delete = async (req, res) => {
+    try {
+        const result = await User.destroy({ where: { ID_User: req.params.id }});
+        result ? res.send({ message: "Deleted" }) : res.status(404).send({ message: "Not found" });
+    } catch (e) { res.status(500).send({ message: e.message }); }
+};
+
+exports.deleteAll = async (_req, res) => {
+    try {
+        const count = await User.destroy({ where: {}, truncate: false });
+        res.send({ message: `${count} records deleted` });
+    } catch (e) { res.status(500).send({ message: e.message }); }
 };

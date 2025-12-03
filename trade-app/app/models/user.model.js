@@ -8,7 +8,7 @@ module.exports = (sequelize, Sequelize) => {
         Login: {
             type: Sequelize.STRING(50),
             allowNull: false,
-            unique: true 
+            unique: true
         },
         PasswordHash: {
             type: Sequelize.STRING(255),
@@ -22,5 +22,6 @@ module.exports = (sequelize, Sequelize) => {
     }, {
         freezeTableName: true
     });
+
     return User;
 };
