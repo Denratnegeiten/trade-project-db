@@ -2,17 +2,40 @@ module.exports = app => {
     const controller = require("../controllers/payment.controller.js");
     const router = require("express").Router();
 
-    // Создание нового платежа
+    /**
+     * @swagger
+     * components:
+     *   schemas:
+     *     Payment:
+     *       type: object
+     *       required:
+     *         - bookingId
+     *         - amount
+     *         - method
+     *       properties:
+     *         id:
+     *           type: integer
+     *           example: 1
+     *         bookingId:
+     *           type: integer
+     *           example: 50
+     *         amount:
+     *           type: number
+     *           example: 750
+     *         method:
+     *           type: string
+     *           example: cash
+     *         date:
+     *           type: string
+     *           format: date-time
+     *           example: 2025-12-09T12:00:00Z
+     */
+
     router.post("/", controller.create);
-    // Получение всех платежей
     router.get("/", controller.findAll);
-    // Получение платежа по ID
     router.get("/:id", controller.findOne);
-    // Обновление платежа по ID
     router.put("/:id", controller.update);
-    // Удаление платежа по ID
     router.delete("/:id", controller.delete);
-    // Удаление всех платежей
     router.delete("/", controller.deleteAll);
 
     app.use("/api/payments", router);

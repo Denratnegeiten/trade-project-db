@@ -1,132 +1,56 @@
 const db = require("../models");
-const Payment = db.payment;
-const Op = db.Sequelize.Op;
+const Payment = db.Payment;
 
-// Создание и сохранение нового Платежа
-exports.create = (req, res) => {
-    // ВАЖНО: Проверьте тело запроса (req.body)
-    if (!req.body.ID_Booking || !req.body.Amount) {
-        res.status(400).send({
-            message: "Content cannot be empty! ID_Booking and Amount are required."
-        });
-        return;
+exports.create = async (req, res) => {
+    try {
+        const payment = await Payment.create(req.body);
+        res.status(201).send(payment);
+    } catch (e) {
+        res.status(500).send({ message: e.message });
     }
-
-    const payment = {
-        ID_Booking: req.body.ID_Booking,
-        PaymentDate: req.body.PaymentDate || new Date(), // Используем текущую дату, если не указана
-        Amount: req.body.Amount,
-        Method: req.body.Method || "Card",
-        Status: req.body.Status || "Pending"
-    };
-
-    Payment.create(payment)
-        .then(data => {
-            res.send(data);
-        })
-        .catch(err => {
-            res.status(500).send({
-                message: err.message || "Some error occurred while creating the Payment."
-            });
-        });
 };
 
-// Получение всех Платежей
-exports.findAll = (req, res) => {
-    Payment.findAll()
-        .then(data => {
-            res.send(data);
-        })
-        .catch(err => {
-            res.status(500).send({
-                message: err.message || "Some error occurred while retrieving payments."
-            });
-        });
+exports.findAll = async (_req, res) => {
+    try {
+        const payments = await Payment.findAll();
+        res.send(payments);
+    } catch (e) {
+        res.status(500).send({ message: e.message });
+    }
 };
 
-// Получение Платежа по ID
-exports.findOne = (req, res) => {
-    const id = req.params.id;
-
-    Payment.findByPk(id)
-        .then(data => {
-            if (data) {
-                res.send(data);
-            } else {
-                res.status(404).send({
-                    message: `Cannot find Payment with id=${id}.`
-                });
-            }
-        })
-        .catch(err => {
-            res.status(500).send({
-                message: "Error retrieving Payment with id=" + id
-            });
-        });
+exports.findOne = async (req, res) => {
+    try {
+        const payment = await Payment.findByPk(req.params.id);
+        payment ? res.send(payment) : res.status(404).send({ message: "Payment not found" });
+    } catch (e) {
+        res.status(500).send({ message: e.message });
+    }
 };
 
-// Обновление Платежа по ID
-exports.update = (req, res) => {
-    const id = req.params.id;
-
-    Payment.update(req.body, {
-        where: { ID_Payment: id }
-    })
-    .then(num => {
-        if (num == 1) {
-            res.send({
-                message: "Payment was updated successfully."
-            });
-        } else {
-            res.send({
-                message: `Cannot update Payment with id=${id}. Maybe Payment was not found or req.body is empty!`
-            });
-        }
-    })
-    .catch(err => {
-        res.status(500).send({
-            message: "Error updating Payment with id=" + id
-        });
-    });
+exports.update = async (req, res) => {
+    try {
+        const result = await Payment.update(req.body, { where: { ID_Payment: req.params.id }});
+        result[0] ? res.send({ message: "Updated" }) : res.status(404).send({ message: "Not found" });
+    } catch (e) {
+        res.status(500).send({ message: e.message });
+    }
 };
 
-// Удаление Платежа по ID
-exports.delete = (req, res) => {
-    const id = req.params.id;
-
-    Payment.destroy({
-        where: { ID_Payment: id }
-    })
-    .then(num => {
-        if (num == 1) {
-            res.send({
-                message: "Payment was deleted successfully!"
-            });
-        } else {
-            res.send({
-                message: `Cannot delete Payment with id=${id}. Maybe Payment was not found!`
-            });
-        }
-    })
-    .catch(err => {
-        res.status(500).send({
-            message: "Could not delete Payment with id=" + id
-        });
-    });
+exports.delete = async (req, res) => {
+    try {
+        const result = await Payment.destroy({ where: { ID_Payment: req.params.id }});
+        result ? res.send({ message: "Deleted" }) : res.status(404).send({ message: "Not found" });
+    } catch (e) {
+        res.status(500).send({ message: e.message });
+    }
 };
 
-// Удаление всех Платежей
-exports.deleteAll = (req, res) => {
-    Payment.destroy({
-        where: {},
-        truncate: false
-    })
-    .then(nums => {
-        res.send({ message: `${nums} Payments were deleted successfully!` });
-    })
-    .catch(err => {
-        res.status(500).send({
-            message: err.message || "Some error occurred while removing all payments."
-        });
-    });
+exports.deleteAll = async (_req, res) => {
+    try {
+        const count = await Payment.destroy({ where: {}, truncate: false });
+        res.send({ message: `${count} records deleted` });
+    } catch (e) {
+        res.status(500).send({ message: e.message });
+    }
 };

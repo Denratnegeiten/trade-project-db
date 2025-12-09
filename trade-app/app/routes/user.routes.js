@@ -2,17 +2,32 @@ module.exports = app => {
     const controller = require("../controllers/user.controller.js");
     const router = require("express").Router();
 
-    // Создание нового пользователя
+    /**
+     * @swagger
+     * components:
+     *   schemas:
+     *     User:
+     *       type: object
+     *       required:
+     *         - username
+     *         - password
+     *       properties:
+     *         id:
+     *           type: integer
+     *           example: 1
+     *         username:
+     *           type: string
+     *           example: admin
+     *         password:
+     *           type: string
+     *           example: secret
+     */
+
     router.post("/", controller.create);
-    // Получение всех пользователей
     router.get("/", controller.findAll);
-    // Получение пользователя по ID
     router.get("/:id", controller.findOne);
-    // Обновление пользователя по ID
     router.put("/:id", controller.update);
-    // Удаление пользователя по ID
     router.delete("/:id", controller.delete);
-    // Удаление всех пользователей
     router.delete("/", controller.deleteAll);
 
     app.use("/api/users", router);

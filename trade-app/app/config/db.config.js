@@ -1,8 +1,10 @@
 module.exports = {
-  HOST: process.env.DB_HOST || "localhost", // Используем DB_HOST (postgresdb)
-  USER: process.env.DB_USER || "postgres", // Используем DB_USER (postgres)
-  PASSWORD: process.env.DB_PASSWORD || "123456", // Используем DB_PASSWORD
-  DB: process.env.DB_NAME || "hotel_db", // Используем DB_NAME
+  HOST: process.env.DB_HOST || "localhost",
+  USER: process.env.DB_USER || "postgres",
+  PASSWORD: process.env.DB_PASSWORD || "123456",
+  DB: process.env.DB_NAME || "hotel_db",
+  PORT: process.env.DB_PORT || 5432, 
+  
   dialect: "postgres",
   pool: {
     max: 5,

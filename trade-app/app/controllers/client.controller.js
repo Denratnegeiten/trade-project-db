@@ -1,5 +1,5 @@
 const db = require("../models");
-const Client = db.client;
+const Client = db.Client;
 
 exports.create = async (req, res) => {
     try {
