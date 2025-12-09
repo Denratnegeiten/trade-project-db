@@ -13,7 +13,6 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Swagger configuration
 const swaggerOptions = {
     swaggerDefinition: {
         openapi: '3.0.0',
@@ -28,13 +27,12 @@ const swaggerOptions = {
             },
         ],
     },
-    apis: ['./app/routes/*.routes.js'], // подключаем все маршруты
+    apis: ['./app/routes/*.routes.js'],
 };
 
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
-// Подключение всех роутов
 require("./app/routes/client.routes")(app);
 require("./app/routes/employee.routes")(app);
 require("./app/routes/hotel.routes")(app);
@@ -43,7 +41,6 @@ require("./app/routes/booking.routes")(app);
 require("./app/routes/payment.routes")(app);
 require("./app/routes/user.routes")(app);
 
-// Синхронизация базы и запуск сервера
 db.sequelize.sync({ alter: true }).then(() => {
     console.log("Database associations defined successfully. Tables structure updated.");
 
@@ -54,7 +51,6 @@ db.sequelize.sync({ alter: true }).then(() => {
     console.error("Failed to sync database:", err);
 });
 
-// Базовый маршрут
 app.get("/", (req, res) => {
     res.json({ message: "Welcome to the Hotel Booking application." });
 });
